@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Streamline Usage Ledger</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --ink: #1c2430;
+    --muted: #6b7684;
+    --line: #e3e7ec;
+    --accent: #2f6f5e;
+    --accent-soft: #e6f0ec;
+    --warn: #a8621b;
+    --warn-soft: #fbf0e2;
+    --ok: #2f6f5e;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  header.topbar {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 0 24px;
+    height: 56px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; }
+  .brand .mark {
+    width: 22px; height: 22px; border-radius: 5px;
+    background: var(--accent);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 12px; font-weight: 700;
+  }
+  nav { display: flex; gap: 4px; }
+  nav a {
+    color: var(--muted); text-decoration: none; padding: 6px 10px; border-radius: 6px; font-size: 13px;
+  }
+  nav a.active { color: var(--ink); background: var(--accent-soft); font-weight: 600; }
+  .topbar .spacer { flex: 1; }
+  .day { color: var(--muted); font-size: 13px; }
+  .day strong { color: var(--ink); font-weight: 600; }
+  main { padding: 20px 24px 32px; max-width: 1280px; margin: 0 auto; }
+  h1 { font-size: 18px; margin: 0 0 2px; font-weight: 600; }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px;
+  }
+  .card .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  .card .value { font-size: 24px; font-weight: 600; margin-top: 6px; }
+  .card .note { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .grid { display: grid; grid-template-columns: 1.55fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  .panel h2 {
+    font-size: 13px; font-weight: 600; margin: 0; padding: 12px 16px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel h2 span.hint { color: var(--muted); font-weight: 400; font-size: 12px; }
+  .panel .body { padding: 14px 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left; color: var(--muted); font-weight: 500; font-size: 12px;
+    padding: 8px 16px; border-bottom: 1px solid var(--line); background: #fafbfc;
+  }
+  td { padding: 9px 16px; border-bottom: 1px solid var(--line); }
+  tr:last-child td { border-bottom: none; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pill {
+    display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 600;
+  }
+  .pill.ok { background: var(--accent-soft); color: var(--ok); }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+  .rate-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px dashed var(--line); font-size: 13px; }
+  .rate-row:last-child { border-bottom: none; }
+  .rate-row .m { color: var(--ink); }
+  .rate-row .p { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--muted); margin-top: 10px; }
+  .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; }
+  .foot { color: var(--muted); font-size: 12px; margin-top: 16px; }
+  svg text { font-family: inherit; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="mark">S</span>Streamline Usage Ledger</div>
+  <nav>
+    <a href="#" class="active">Ledger</a>
+    <a href="#">Rate cards</a>
+    <a href="#">Reconciliation</a>
+    <a href="#">Replays</a>
+  </nav>
+  <div class="spacer"></div>
+  <div class="day">Billing day <strong>2025-03-14</strong> &middot; rate card v7</div>
+</header>
+
+<main>
+  <h1>Daily usage ledger</h1>
+  <div class="sub">Hourly buckets rated from raw product events, reconciled against the event totals for the day.</div>
+
+  <section class="cards">
+    <div class="card">
+      <div class="label">Raw events</div>
+      <div class="value">1.4M</div>
+      <div class="note">processed in one day of replay</div>
+    </div>
+    <div class="card">
+      <div class="label">Duplicates dropped</div>
+      <div class="value">0.02%</div>
+      <div class="note">by the deduplication window</div>
+    </div>
+    <div class="card">
+      <div class="label">Median rating time</div>
+      <div class="value">38 ms</div>
+      <div class="note">per hourly bucket</div>
+    </div>
+    <div class="card">
+      <div class="label">Reconciled</div>
+      <div class="value">100%</div>
+      <div class="note">ledger lines against raw totals</div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="panel">
+      <h2>Usage by hour <span class="hint">billable units, all accounts</span></h2>
+      <div class="body">
+        <svg id="chart" viewBox="0 0 640 200" width="100%" height="200" role="img" aria-label="Billable units per hour"></svg>
+        <div class="legend"><span><i style="background:#2f6f5e"></i>rated units</span><span><i style="background:#c9d6d1"></i>included units</span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Active rate card <span class="hint">v7</span></h2>
+      <div class="body" id="ratecard"></div>
+    </div>
+  </section>
+
+  <section class="panel" style="margin-bottom:14px">
+    <h2>Ledger lines <span class="hint">top accounts by amount</span></h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Account</th>
+          <th>Meter</th>
+          <th>Hour</th>
+          <th class="num">Quantity</th>
+          <th class="num">Amount</th>
+          <th>Rate</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="ledger"></tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <h2>Reconciliation <span class="hint">raw event totals vs rated ledger</span></h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Account</th>
+          <th>Meter</th>
+          <th class="num">Raw total</th>
+          <th class="num">Ledger total</th>
+          <th class="num">Delta</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody id="recon"></tbody>
+    </table>
+  </section>
+
+  <div class="foot">Buckets written idempotently on account, meter and hour. A replayed batch updates the same line instead of adding a new one.</div>
+</main>
+
+<script>
+const hourly = [
+  { h: "00", rated: 41200, included: 18000 },
+  { h: "01", rated: 33800, included: 18000 },
+  { h: "02", rated: 29100, included: 18000 },
+  { h: "03", rated: 26400, included: 18000 },
+  { h: "04", rated: 31200, included: 18000 },
+  { h: "05", rated: 44900, included: 18000 },
+  { h: "06", rated: 61800, included: 18000 },
+  { h: "07", rated: 78400, included: 18000 },
+  { h: "08", rated: 91200, included: 18000 },
+  { h: "09", rated: 96800, included: 18000 },
+  { h: "10", rated: 94100, included: 18000 },
+  { h: "11", rated: 88700, included: 18000 },
+  { h: "12", rated: 79300, included: 18000 },
+  { h: "13", rated: 82600, included: 18000 },
+  { h: "14", rated: 90100, included: 18000 },
+  { h: "15", rated: 87400, included: 18000 },
+  { h: "16", rated: 81200, included: 18000 },
+  { h: "17", rated: 73500, included: 18000 },
+  { h: "18", rated: 64100, included: 18000 },
+  { h: "19", rated: 57200, included: 18000 },
+  { h: "20", rated: 51800, included: 18000 },
+  { h: "21", rated: 47600, included: 18000 },
+  { h: "22", rated: 43100, included: 18000 },
+  { h: "23", rated: 38900, included: 18000 }
+];
+
+const rateCard = [
+  { meter: "api_calls", price: "$0.0004 / call", included: "18,000 / hour" },
+  { meter: "storage_gb_hours", price: "$0.00009 / GB-hour", included: "500 GB-hours" },
+  { meter: "egress_gb", price: "$0.012 / GB", included: "25 GB" },
+  { meter: "compute_seconds", price: "$0.000021 / s", included: "3,600 s" },
+  { meter: "seats", price: "$9.00 / seat / day", included: "0" }
+];
+
+const ledger = [
+  { account: "acct_4f21", meter: "api_calls", hour: "09:00", qty: 96800, amount: "$31.52", rate: "v7", status: "ok" },
+  { account: "acct_9b07", meter: "compute_seconds", hour: "10:00", qty: 412000, amount: "$8.57", rate: "v7", status: "ok" },
+  { account: "acct_1c88", meter: "egress_gb", hour: "14:00", qty: 1840, amount: "$21.78", rate: "v7", status: "ok" },
+  { account: "acct_4f21", meter: "storage_gb_hours", hour: "11:00", qty: 12400, amount: "$1.07", rate: "v7", status: "ok" },
+  { account: "acct_77de", meter: "seats", hour: "00:00", qty: 42, amount: "$378.00", rate: "v7", status: "ok" },
+  { account: "acct_9b07", meter: "api_calls", hour: "08:00", qty: 91200, amount: "$29.28", rate: "v6", status: "warn" },
+  { account: "acct_2a55", meter: "egress_gb", hour: "16:00", qty: 610, amount: "$7.02", rate: "v7", status: "ok" }
+];
+
+const recon = [
+  { account: "acct_4f21", meter: "api_calls", raw: 96800, led: 96800, delta: 0, ok: true },
+  { account: "acct_9b07", meter: "compute_seconds", raw: 412000, led: 412000, delta: 0, ok: true },
+  { account: "acct_1c88", meter: "egress_gb", raw: 1840, led: 1840, delta: 0, ok: true },
+  { account: "acct_4f21", meter: "storage_gb_hours", raw: 12400, led: 12400, delta: 0, ok: true },
+  { account: "acct_77de", meter: "seats", raw: 42, led: 42, delta: 0, ok: true },
+  { account: "acct_9b07", meter: "api_calls", raw: 91200, led: 91196, delta: -4, ok: false },
+  { account: "acct_2a55", meter: "egress_gb", raw: 610, led: 610, delta: 0, ok: true }
+];
+
+function fmt(n) { return n.toLocaleString("en-US"); }
+
+function drawChart() {
+  const svg = document.getElementById("chart");
+  const W = 640, H = 200, padL = 44, padB = 22, padT = 8;
+  const max = Math.max(...hourly.map(d => d.rated));
+  const innerW = W - padL - 8, innerH = H - padB - padT;
+  const bw = innerW / hourly.length;
+  let out = "";
+  for (let g = 0; g <= 4; g++) {
+    const y = padT + innerH - (innerH * g) / 4;
+    const v = Math.round((max * g) / 4 / 1000);
+    out += `<line x1="${padL}" y1="${y}" x2="${W - 8}" y2="${y}" stroke="#eef1f4" stroke-width="1"/>`;
+    out += `<text x="${padL - 8}" y="${y + 4}" text-anchor="end" font-size="10" fill="#6b7684">${v}k</text>`;
+  }
+  hourly.forEach((d, i) => {
+    const x = padL + i * bw + 2;
+    const w = bw - 4;
+    const hRated = (d.rated / max) * innerH;
+    const hIncl = (d.included / max) * innerH;
+    out += `<rect x="${x}" y="${padT + innerH - hRated}" width="${w}" height="${hRated}" fill="#2f6f5e" rx="1"/>`;
+    out += `<rect x="${x}" y="${padT + innerH - hIncl}" width="${w}" height="${hIncl}" fill="#c9d6d1" rx="1"/>`;
+    if (i % 3 === 0) {
+      out += `<text x="${x + w / 2}" y="${H - 6}" text-anchor="middle" font-size="10" fill="#6b7684">${d.h}:00</text>`;
+    }
+  });
+  svg.innerHTML = out;
+}
+
+function renderRateCard() {
+  const el = document.getElementById("ratecard");
+  el.innerHTML = rateCard.map(r =>
+    `<div class="rate-row"><span class="m">${r.meter}</span><span class="p">${r.price} &middot; incl. ${r.included}</span></div>`
+  ).join("");
+}
+
+function renderLedger() {
+  const el = document.getElementById("ledger");
+  el.innerHTML = ledger.map(r =>
+    `<tr>
+      <td class="mono">${r.account}</td>
+      <td>${r.meter}</td>
+      <td class="mono">${r.hour}</td>
+      <td class="num">${fmt(r.qty)}</td>
+      <td class="num">${r.amount}</td>
+      <td class="mono">${r.rate}</td>
+      <td><span class="pill ${r.status === "ok" ? "ok" : "warn"}">${r.status === "ok" ? "rated" : "replayed"}</span></td>
+    </tr>`
+  ).join("");
+}
+
+function renderRecon() {
+  const el = document.getElementById("recon");
+  el.innerHTML = recon.map(r =>
+    `<tr>
+      <td class="mono">${r.account}</td>
+      <td>${r.meter}</td>
+      <td class="num">${fmt(r.raw)}</td>
+      <td class="num">${fmt(r.led)}</td>
+      <td class="num">${r.delta === 0 ? "0" : r.delta}</td>
+      <td><span class="pill ${r.ok ? "ok" : "warn"}">${r.ok ? "matched" : "shortfall"}</span></td>
+    </tr>`
+  ).join("");
+}
+
+drawChart();
+renderRateCard();
+renderLedger();
+renderRecon();
+</script>
+</body>
+</html>
