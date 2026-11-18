@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "streamline-usage-ledger"
+version = "0.4.0"
+description = "Event-driven usage metering pipeline: raw events to billable, auditable ledger lines"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+  "pydantic>=2.7,<3",
+  "confluent-kafka>=2.4,<3",
+  "pyspark>=3.5,<4",
+  "psycopg[binary]>=3.1,<4",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+  "pytest-cov>=5.0",
+]
+
+[project.scripts]
+ledger-ingest = "ledger.ingest:main"
+ledger-aggregate = "ledger.aggregate:main"
+ledger-reconcile = "ledger.reconcile:main"
+
+[tool.setuptools.packages.find]
+include = ["ledger*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
